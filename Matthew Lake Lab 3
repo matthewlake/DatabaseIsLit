@@ -1,0 +1,63 @@
+-- Matthew Lake
+-- Lab 3
+-- 02/06/2017
+
+-- Query 1
+select ordNumber, totalUSD
+from Orders;
+
+-- Query 2
+select name, city 
+from Agents
+where name = 'Smith';
+
+-- Query 3
+select pid, name, priceUSD 
+from Products 
+where quantity > 200100;
+
+-- Query 4
+select name, city
+from Customers
+where city = 'Duluth';
+
+-- Query 5
+select name
+from Agents
+where city not in ('New York', 'Duluth');
+
+-- Query 6
+select *
+from Products
+where city not in ('Dallas', 'Duluth')
+		   and priceUSD >= 1;
+
+-- Query 7
+select *
+from Orders
+where month in ('Feb', 'May');
+
+-- Query 8
+select *
+from Orders
+where month = 'Feb'
+	  and totalUSD >= 600;
+
+-- Query 9
+select *
+from Orders
+where cid = 'c005';
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
