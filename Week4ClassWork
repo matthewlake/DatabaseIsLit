@@ -1,0 +1,69 @@
+-- Customers who placed orders through
+-- agents in Dallas and Duluth
+
+select distinct cid
+from Orders
+where aid in (select aid
+			  from Agents
+			  where city in ('Dallas', 'Duluth')
+              )
+order by cid ASC;
+
+
+select count(name) as "number of orders"
+from Agents
+
+select *
+from Agents
+
+update Agents
+set name = NULL
+where aid = 'a01';
+
+select avg(qty)
+from Orders
+where month in ('Jan', 'Feb');
+
+select pid,
+	   count(*)
+from Orders
+group by pid
+order by count(*) DESC,
+		 pid	
+limit 3;
+
+select *
+from Orders
+
+select month, 
+	   avg(qty) as "monthlyQty"
+from Orders
+group by month
+order by "monthlyQty" DESC;
+
+select month, 
+	   avg(qty) as "monthlyQty"
+from Orders
+where pid = 'p01'
+group by month
+having avg(qty) < 1000
+order by "monthlyQty" ASC;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
