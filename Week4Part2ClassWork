@@ -1,0 +1,50 @@
+select month,
+	   sum (totalUSD) as "total sales"
+from orders
+group by month
+order by "total sales" DESC;
+
+-- Cartesian Product (Virtually useless)
+select *
+from Customers, Orders
+order by customers.cid,
+		  orders.ordnumber
+
+-- Inner Join
+select *
+from Customers, 
+	 Orders,
+     Agents,
+     Products
+where orders.cid = customers.cid
+  and orders.aid = agents.aid
+  and orders.pid = products.pid
+  and orders.month = 'Jan'
+  and products.city = 'Duluth'
+ 
+
+select *
+from customers inner join orders on orders.cid = customers.cid
+			   inner join agents on orders.aid = agents.aid
+               inner join products on orders.pid = products.pid
+where orders.month = 'Jan' 
+ and products.city = 'Duluth'
+               
+
+-- Answer on lab 4 or 5 customers and agents in the same city
+select *
+from customers c,
+	 agents a
+where a.city = c.city
+
+
+
+
+
+
+
+
+          
+          
+
+
