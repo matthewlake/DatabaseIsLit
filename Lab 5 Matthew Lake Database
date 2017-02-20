@@ -1,0 +1,71 @@
+-- Matthew Lake
+-- Lab 5
+-- 02/20/2017
+
+-- Query 1
+select a.city
+from Agents a, orders o
+where o.cid = 'c006'
+  and a.aid = o.aid
+  			order by city ASC;
+
+-- Query 2
+select distinct pid
+from Customers c, Orders o
+where o.cid = c.cid
+ and c.city = 'Kyoto'
+			order by pid DESC; 
+            
+-- Query 3
+select name
+from Customers
+where not cid in(
+    			select cid
+    			from Orders);
+                
+-- Query 4
+select c.name
+from Customers c
+left outer join Orders o on c.cid = o.cid
+where o.cid is null;
+
+-- Query 5
+select distinct c.name, a.name
+from Customers c, Orders o, Agents a
+where a.aid = o.aid
+  and c.cid = o.cid
+ and c.city = a.city;
+
+-- Query 6
+select c.name, a.name, c.city
+from Customers c, Agents a
+where c.city = a.city;
+
+-- Query 7
+select c.name, c.city
+from Customers c
+where c.city in(
+    		   select city
+    		   from Products
+    	       group by city
+    		   order by count(pid) ASC
+    		   limit 1);
+               
+               
+               
+
+
+
+
+
+
+ 
+
+
+
+
+
+    
+
+
+
