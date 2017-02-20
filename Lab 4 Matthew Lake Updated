@@ -1,0 +1,102 @@
+-- Matthew Lake
+-- Lab 4
+-- 02/13/2017
+
+-- Query 1
+
+select distinct city from Agents
+where aid in(
+			select aid from Orders
+    		where cid = 'c006')
+            				   order by city ASC;
+   
+-- Query 2
+
+select distinct pid from Orders 
+where aid in(
+			select aid from Orders
+    		where cid in
+						(select cid from Customers 
+                     	 where city = 'Kyoto'))
+									order by pid DESC;
+                                  
+-- Query 3
+
+select distinct cid, name from Customers
+where cid not in(
+				select distinct cid from Orders
+    			where aid = 'a01')
+                				 order by cid ASC;
+                                 
+-- Query 4
+
+select cid from Customers
+where cid in(
+			select cid from Orders
+    		where pid = 'p01')
+and cid in(
+    	  select cid from Orders
+    	  where pid = 'p07'); 
+          
+-- Query 5
+
+select distinct pid from Orders
+where cid not in(
+				select cid from Orders
+    			where aid = 'a08')
+                				 order by pid DESC;
+                                 
+-- Query 6
+
+Select name, discount, city from Customers
+where cid in(
+    		select cid from Orders
+    		where aid in(
+                		select aid from Agents
+                		where city = 'Tokyo' or city = 'New York'))
+                        										  order by name ASC;
+        
+-- Query 7
+
+select * from Customers
+where discount in(
+    			 select discount from Customers
+    			 where city = 'Duluth' or city = 'London');
+                 
+-- 8. Check Constraints
+/*
+Check constraints are used to limit the value range that can be placed in a column.
+A check constraint enforces domain integrity by limiting the values that are accepted
+by one or more columns. Check constraints determine the valid values from a logical 
+expression. The advantage of check constraints are their ability to enforce rules
+in the database and provide data integrity. A check constraint can be used with any 
+logical boolean expression that returns true or false. An example of a good use of 
+check constraint is on prices for products, simply because no product can have a 
+negative value. Another good use would be regarding someones age, if a person was 
+allowed to buy alcohol. We know that you must be 21 or older to purchase alcohol, 
+so a check constraint would work in this scenario. A bad example of using check 
+constraints would be regarding social security numbers. This is because it is not 
+necessary to restrict social security number since they are unique or an individual
+may not have one which would create a null value and not allow for a check constraint
+to work.
+*/ 
+
+                 
+                 
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+                         
+
+            
