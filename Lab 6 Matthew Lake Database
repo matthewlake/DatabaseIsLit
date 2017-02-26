@@ -1,0 +1,85 @@
+-- Matthew Lake
+-- Lab 6
+-- 02/26/2017
+
+-- Query 1
+select name, city
+from Customers
+where city in(
+			 select city
+    		 from Products
+    		 group by city
+    		 order by count(products.city) 
+    		 limit 1);
+             
+-- Query 2
+select name
+from Products p
+where priceUSD >(
+    			select AVG(priceUSD)
+    			from Products)
+                	order by name DESC;
+                    
+-- Query 3
+select customers.name, orders.pid, orders.totalUSD
+from Orders
+inner join Customers
+on orders.cid = customers.cid
+order by orders.totalUSD DESC;
+
+-- Query 4
+select customers.name, coalesce(SUM(orders.qty), 0) as "Total Ordered"
+from Orders
+right outer join Customers
+on orders.cid = customers.cid
+group by customers.name
+order by customers.name ASC;
+
+-- Query 5
+select customers.name, products.name, agents.name
+from Orders
+inner join Customers
+on orders.cid = customers.cid
+inner join Products
+on orders.pid = products.pid
+inner join agents
+on orders.aid = agents.aid
+where agents.city = 'Newark';
+
+-- Query 6
+select *
+from (select o.*, o.qty*p.priceusd*(1-(discount/100)) as CheckAccuracy
+     from orders o
+     inner join products p on o.pid = p.pid
+     inner join customers c on o.cid = c.cid) as comparedvalues
+     		where totalUSD != CheckAccuracy;
+
+-- Question 7
+/*
+The difference between a left outer join and a right outer join are the tables that
+will be displayed. In a left outer join, all of the rows from the left table will be
+displayed, even if there are any matching columns in the right table. In a right 
+outer join, all of the rows from the right table will be displayed, regardless if 
+there are any matching columns in the left table. 
+*/
+
+-- Example of Left Outer Join:
+select *
+from Orders
+left outer join Customers
+on customers.cid = orders.cid
+
+-- Here orders would be the left table because it comes first in our join statement. This 
+-- makes the customers table the right table. The result has all of the orders table and
+-- values for parts of the customers table.
+
+-- Example of Right Outer Join:
+select *
+from Orders
+right outer join Customers
+on customers.cid = orders.cid
+
+-- Here orders would still be the left table because it comes first in our join statement.
+-- Making the customers table the right table. The result has all of the customers table 
+-- and values for parts of the orders table.
+
