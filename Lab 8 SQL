@@ -1,0 +1,164 @@
+-- Matthew Lake
+-- Lab 8
+-- 03/26/2017
+
+
+DROP TABLE IF EXISTS People;
+DROP TABLE IF EXISTS Actors;
+DROP TABLE IF EXISTS Directors;
+DROP TABLE IF EXISTS Movies;
+DROP TABLE IF EXISTS MovieActors;
+DROP TABLE IF EXISTS MovieDirectors;
+
+
+-- People --
+CREATE TABLE People (
+    PID					integer not null,
+    FirstName			text,
+    LastName			text,
+    Address				text,
+    SpouseName			text,
+    primary key(PID)
+);
+
+-- Actors --
+CREATE TABLE Actors (
+    PID					integer not null references People(PID),
+    BirthDate			date,
+    HairColor			text,			
+    EyeColor			text,
+    HeightInInches		int,
+    Weight				int,
+    FavColor			text,
+    SAGAD				date,
+    primary key(PID)
+);
+
+-- Directors --
+CREATE TABLE Directors (
+    PID					integer not null references People(PID),
+    FilmSchool			text,
+    DGAD				date,
+    FavLensMaker		text,
+    primary key(PID)
+);
+
+-- Movies --
+CREATE TABLE Movies (
+    MID					integer not null,
+    MovieName			text,
+    YearReleased		integer,
+    MPAA				integer,
+    DomesticSalesUSD	integer,
+    ForeignSalesUSD		integer,	
+    DVDBlueraySalesUSD	integer,
+    primary key(MID)
+);
+
+-- MovieActors --
+CREATE TABLE MovieActors (
+    MID					integer not null references Movies(MID),
+    PID					integer not null references People(PID),
+    primary key(MID,PID)
+);
+
+-- MovieDirectors --
+CREATE TABLE MovieDirectors (
+     MID					integer not null references Movies(MID),
+    PID					integer not null references People(PID),
+    primary key(MID,PID)
+);
+
+-- SQL statements for loading example data --
+
+-- People --
+INSERT INTO People( PID, FirstName, LastName, Address, SpouseName )
+	VALUES('007', 'Sean', 'Connery', 'James Bond is everywhere', 'M');
+    
+INSERT INTO People( PID, FirstName, LastName, Address, SpouseName )
+	VALUES('1', 'Steven', 'Spielberg', '112 Hollywood Blvd', 'Jessica');
+
+INSERT INTO People( PID, FirstName, LastName, Address, SpouseName )
+	VALUES('8', 'Kobe', 'Bryant', 'Los Angeles, CA', 'Gabriel');
+    
+INSERT INTO People( PID, FirstName, LastName, Address, SpouseName )
+	VALUES('2', 'Terence', 'Young', 'Los Angeles, CA', 'Brittany');
+ 
+
+-- Actors --
+INSERT INTO Actors( PID, BirthDate, HairColor, EyeColor, HeightInInches,
+                    Weight, FavColor, SAGAD )
+	VALUES('007', '08/19/1950', 'Black', 'Blue', '72', '195', 'Purple', '01/22/1965');
+
+INSERT INTO Actors( PID, BirthDate, HairColor, EyeColor, HeightInInches,
+                    Weight, FavColor, SAGAD )
+	VALUES('8', '08/09/1972', 'Black', 'Brown', '78', '190', 'Yellow', '04/22/1987');
+
+-- Directors --
+INSERT INTO Directors( PID, FilmSchool, DGAD, FavLensMaker )
+	VALUES('1', 'Marist College', '05/12/1983', 'Spalding');
+    
+INSERT INTO Directors( PID, FilmSchool, DGAD, FavLensMaker )
+	VALUES('2', 'Duke', '05/12/1920', 'Gucci');
+  
+-- Movies --
+INSERT INTO Movies( MID, MovieName, YearReleased, MPAA, DomesticSalesUSD, ForeignSalesUSD,
+                    DVDBlueraySalesUSD )
+	VALUES('11','From Russia with Love', '1963', '124', '142000', '122000', '83000');
+    
+INSERT INTO Movies( MID, MovieName, YearReleased, MPAA, DomesticSalesUSD, ForeignSalesUSD,
+                    DVDBlueraySalesUSD )
+	VALUES('12','Thunderball', '1965', '225', '212000', '192000', '23000');
+    
+-- MovieActors --
+INSERT INTO MovieActors( MID, PID)
+	VALUES('11','007');
+    
+INSERT INTO MovieActors( MID, PID)
+	VALUES('12','007');
+
+INSERT INTO MovieActors( MID, PID)
+	VALUES('11','8');
+
+-- MovieDirectors --
+INSERT INTO MovieDirectors( MID, PID)
+	VALUES('11','1');
+    
+INSERT INTO MovieDirectors( MID, PID)
+	VALUES('12','2');
+
+-- Query to show all directors with whom actor "Sean Connery" has worked.
+select distinct People
+from People, Movies, Directors, MovieDirectors
+	where people.pid = directors.pid
+		and directors.pid = moviedirectors.pid
+		and moviedirectors.mid = movies.mid
+		and moviedirectors.mid in 
+				(select distinct movies.mid from people, movieactors, movies, actors
+ 						where people.firstname = 'Sean'
+ 							and people.lastname = 'Connery'
+ 							and people.pid = actors.pid
+ 							and actors.pid = movieactors.pid);
+
+                
+                
+select *
+from People;
+
+select *
+from Actors;
+
+select *
+from Directors;
+
+select *
+from Movies;
+
+select *
+from MovieActors;
+
+select *
+from MovieDirectors;
+
+
+
