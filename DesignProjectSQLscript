@@ -1,0 +1,703 @@
+DROP TABLE IF EXISTS cifgeardetails
+DROP TABLE IF EXISTS cifgear
+DROP TABLE IF EXISTS weapondetails;
+DROP TABLE IF EXISTS records;
+DROP TABLE IF EXISTS jobcode;
+DROP TABLE IF EXISTS positions;
+DROP TABLE IF EXISTS staff;
+DROP TABLE IF EXISTS marines;
+DROP TABLE IF EXISTS deploymentstatuscode;
+DROP TABLE IF EXISTS people;
+DROP TABLE IF EXISTS states;
+DROP VIEW IF EXISTS MarineInfo;
+DROP VIEW IF EXISTS MarineCIF;
+
+
+CREATE TABLE states (
+	ZipCode			INTEGER 	NOT NULL,				
+	City			TEXT 		NOT NULL,
+	State			TEXT		NOT NULL,
+primary key(ZipCode)
+);
+
+CREATE TABLE people (
+	PersonID		CHAR(8)		NOT NULL UNIQUE,	
+	FirstName		TEXT		NOT NULL,
+	LastName		TEXT		NOT NULL,
+	StreetAddress	TEXT		NOT NULL,
+	ZipCode			INTEGER		NOT NULL,
+	DOB				DATE		NOT NULL,
+	Gender			CHAR(1)		NOT NULL,
+CONSTRAINT check_Gender CHECK (Gender = 'M' OR Gender = 'F'),
+primary key(PersonID),
+foreign key(ZipCode) references states(ZipCode)
+);
+
+CREATE TABLE deploymentstatuscode (
+	DSCode					INTEGER			NOT NULL, 
+	CodeDescription			TEXT			NOT NULL,
+primary key(DSCode)
+);
+
+CREATE TABLE marines (
+	PersonID				CHAR(8)			NOT NULL UNIQUE REFERENCES people(PersonID),
+	DSCode					INTEGER			NOT NULL REFERENCES deploymentstatuscode(DSCode),
+	Rank					TEXT			NOT NULL,
+	HeightInInches			INTEGER			NOT NULL,
+	WeightInLbs				INTEGER			NOT NULL,
+	BloodType				CHAR(3)			NOT NULL,
+	YearsServed				INTEGER			NOT NULL,
+	MaritalStatus			CHAR(1)			NOT NULL,
+CONSTRAINT check_MaritalStatus CHECK (MaritalStatus = 'S' OR MaritalStatus = 'M'),
+primary key(PersonID)
+);
+
+CREATE TABLE staff (
+	PersonID				CHAR(8)			NOT NULL UNIQUE REFERENCES people(PersonID),
+	DSCode					INTEGER			NOT NULL REFERENCES deploymentstatuscode(DSCode),
+	StartDate				DATE			NOT NULL,
+	EndDate					DATE ,
+primary key(PersonID)
+);
+
+CREATE TABLE positions (
+	PositionID				CHAR(4)			NOT NULL UNIQUE,		
+	PersonID				CHAR(8)			NOT NULL UNIQUE REFERENCES staff(PersonID),
+	PositionTitle			TEXT ,
+	SalaryUSD				NUMERIC ,
+primary key(PositionID)
+);
+
+CREATE TABLE jobcode (
+	PersonID				CHAR(8)			NOT NULL UNIQUE REFERENCES marines(PersonID),
+	MOS						CHAR(4)			NOT NULL,
+	JobTitle				TEXT			NOT NULL,
+	JobDescription			TEXT			NOT NULL,
+primary key(PersonID)
+);
+
+CREATE TABLE records (
+	RecordID				CHAR(8)			NOT NULL UNIQUE REFERENCES marines(PersonID),
+	PersonID				CHAR(8)			NOT NULL REFERENCES marines(PersonID),
+	RangeScore				INTEGER			NOT NULL,
+	PFT						INTEGER			NOT NULL,
+	CFT						INTEGER			NOT NULL,
+primary key(RecordID)
+);
+
+CREATE TABLE weapondetails (
+	WeaponID				INTEGER			NOT NULL UNIQUE,
+	PersonID				CHAR(8)			NOT NULL UNIQUE REFERENCES marines(PersonID),
+	WeaponType				TEXT			NOT NULL,
+	WeaponScope				TEXT ,
+	WeaponSling				TEXT ,
+primary key(WeaponID)
+);
+
+CREATE TABLE cifgear (
+	EquipmentID				CHAR(8)			NOT NULL UNIQUE,
+	PersonID				CHAR(8)			NOT NULL UNIQUE REFERENCES marines(PersonID),
+	GasMaskID				INTEGER			NOT NULL,
+	SapiID					INTEGER			NOT NULL,
+primary key(EquipmentID)
+);
+
+CREATE TABLE cifgeardetails (
+	EquipmentID				CHAR(8)			NOT NULL UNIQUE REFERENCES cifgear(EquipmentID),
+	BlouseSize				TEXT			NOT NULL,
+	TrouserSize				TEXT			NOT NULL,
+	BootSize				NUMERIC			NOT NULL,
+	KevlarSize				TEXT			NOT NULL,
+	FlakJacketSize			TEXT			NOT NULL,
+primary key (EquipmentID)
+);
+
+
+
+
+
+
+-- States Inserts--
+
+INSERT INTO states ( ZipCode, City, State )
+	VALUES ('12603', 'Poughkeepsie', 'NY');
+	
+INSERT INTO states ( ZipCode, City, State )
+	VALUES ('34213', 'Philidelphia', 'PA');
+
+INSERT INTO states ( ZipCode, City, State )
+	VALUES ('26744', 'Augusta', 'MI');
+	
+INSERT INTO states ( ZipCode, City, State )
+	VALUES ('73123', 'Little Rock', 'AK');
+
+INSERT INTO states ( ZipCode, City, State )
+	VALUES ('12540', 'Hopewell Jct', 'NY');
+	
+INSERT INTO states ( ZipCode, City, State )
+	VALUES ('43276', 'Naples', 'FL');
+
+INSERT INTO states ( ZipCode, City, State )
+	VALUES ('85463', 'Los Angeles', 'CA');
+	
+INSERT INTO states ( ZipCode, City, State )
+	VALUES ('12453', 'Venice', 'CA');
+
+INSERT INTO states ( ZipCode, City, State )
+	VALUES ('21443', 'Tusan', 'AZ');
+	
+INSERT INTO states ( ZipCode, City, State )
+	VALUES ('44513', 'Boston', 'MA');
+	
+
+-- DeploymentStatusCode Inserts --
+
+INSERT INTO deploymentstatuscode ( DSCode, CodeDescription )
+	VALUES ('1001','Not Deployable');
+	
+INSERT INTO deploymentstatuscode ( DSCode, CodeDescription )
+	VALUES ('1002','Deployable no limitations');
+
+INSERT INTO deploymentstatuscode ( DSCode, CodeDescription )
+	VALUES ('1003','Deployable maximum 6 month tour');
+
+INSERT INTO deploymentstatuscode ( DSCode, CodeDescription )
+	VALUES ('1004','Deployable maximum 8 month tour');
+
+-- People Inserts --
+
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p1', 'Matthew', 'Lake', '24 Goose Rd', '12603', '08/19/1992','M');
+
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p2', 'Alan', 'Labouseur', '24 Marist Dr', '12603', '02/21/1902','M');
+
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p3', 'Rocky', 'Balboa', '35 Phili Dr', '34213', '02/12/1956','M');
+
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p4', 'John', 'Bones', '657 Raptor St', '26744', '01/18/1984','M');
+
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p5', 'Jennifer', 'Lopez', '242 Noxon Rd', '73123', '02/12/1956', 'F');
+
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p6', 'Brandon', 'Stellato', '43 Cranberry Dr', '12540', '06/12/1992', 'M');
+
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p7', 'Mike', 'Lockwood', '64 Huckleberry Dr', '12540', '05/12/1992', 'M');
+    
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p8', 'Steph', 'Curry', '12 MVP Ln', '43276', '10/23/1987', 'M');
+
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p9', 'Chris', 'Paul', '32 Hollywood Dr', '85463', '07/04/1983', 'M');
+    
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p10', 'Sean', 'Connery', '18 Dolly Dr', '12453', '01/12/1946', 'M');
+    
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p11', 'Dean', 'Winchester', '14 Bighorn Dr', '85463', '02/17/1974', 'M');
+
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p12', 'Sam', 'Winchester', '14 Bighorn Dr', '85463', '11/25/1971', 'M');
+    
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p13', 'Larry', 'Bird', '9 Garden St', '21443', '10/21/1959', 'M');    
+
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p14', 'Ben', 'Wallace', '821 City Dr', '34213', '07/19/1981', 'M');
+    
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p15', 'Selena', 'Gomez', '124 Princess Ln', '12453', '06/27/1989', 'F');
+    
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p16', 'Marissa', 'McGrath', '643 Hollywood Dr', '85463', '04/06/1983', 'F');
+    
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p17', 'Will', 'Smith', 'Journey St', '26744', '01/20/1973', 'M');
+    
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p18', 'Brad', 'Pitt', 'Stringham Rd', '12603', '12/24/1969', 'M');
+    
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p19', 'Sue', 'Lemon', 'Fruit Dr', '34213', '05/16/1987', 'F');
+    
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p20', 'Rob', 'Dyrdek', 'Venice St', '43276', '08/14/1959', 'M');
+    
+INSERT INTO people ( PersonID, FirstName, LastName, StreetAddress, ZipCode, DOB, Gender )
+	VALUES ('p21', 'Brittany', 'Spears', 'Blonde St', '44513', '09/23/1973', 'F');
+    
+-- Marines Inserts --
+
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p1', '1002', 'Sergeant', '67', '175', 'A+', '4', 'S');
+	
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p3', '1002', 'Master Sergeant', '73', '210', 'A-', '13', 'M');
+	
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p4', '1002', 'Lance Corporal', '71', '186', 'AB+', '2', 'S');
+
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p6', '1003', 'Sergeant', '69', '215', 'B-', '6', 'S');
+
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p7', '1001', 'Private First Class', '70', '174', 'O-', '1', 'S');
+
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p9', '1002', 'Gunnery Sergeant', '75', '225', 'AB-', '9', 'M');
+
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p11', '1004', 'Captain', '77', '200', 'O+', '8', 'M');	
+
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p13', '1003', 'Corporal', '71', '160', 'B-', '3', 'S');
+
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p14', '1002', 'Staff Sergeant', '73', '195', 'A+', '11', 'M');
+
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p16', '1001', 'Private', '66', '155', 'O-', '1', 'S');
+
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p17', '1004', 'Private First Class', '72', '175', 'AB-', '2', 'S');
+
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p20', '1002', 'Lance Corporal', '69', '166', 'B+', '2', 'M');
+
+INSERT INTO marines ( PersonID, DSCode, Rank, HeightInInches, WeightInLbs, BloodType, 
+					YearsServed, MaritalStatus)
+	VALUES ('p21', '1001', 'Private First Class', '75', '197', 'A+', '1', 'S');
+
+-- Staff Inserts --
+INSERT INTO staff ( PersonID, DSCode, StartDate, EndDate )
+	VALUES ('p2', '1002', '03/23/2016', null);
+
+INSERT INTO staff ( PersonID, DSCode, StartDate, EndDate )
+	VALUES ('p5', '1002', '01/14/2015', null);
+
+INSERT INTO staff ( PersonID, DSCode, StartDate, EndDate )
+	VALUES ('p8', '1004', '07/23/2017', null);
+
+INSERT INTO staff ( PersonID, DSCode, StartDate, EndDate )
+	VALUES ('p10', '1003', '11/13/2014', '06/04/2016');
+    
+INSERT INTO staff ( PersonID, DSCode, StartDate, EndDate )
+	VALUES ('p12', '1004', '09/12/2013', null);
+
+INSERT INTO staff ( PersonID, DSCode, StartDate, EndDate )
+	VALUES ('p15', '1001', '05/18/2015', null);
+
+INSERT INTO staff ( PersonID, DSCode, StartDate, EndDate )
+	VALUES ('p18', '1002', '02/08/2012', null);
+
+INSERT INTO staff ( PersonID, DSCode, StartDate, EndDate )
+	VALUES ('p19', '1002', '03/04/2010', null);
+    
+
+-- Positions Inserts --
+
+INSERT INTO positions ( PositionID, PersonID, PositionTitle, SalaryUSD )
+	VALUES ('1', 'p2', 'King Ruler', '1000000000');
+
+INSERT INTO positions ( PositionID, PersonID, PositionTitle, SalaryUSD )
+	VALUES ('2', 'p5', 'Operations Chief', '130000');
+
+INSERT INTO positions ( PositionID, PersonID, PositionTitle, SalaryUSD )
+	VALUES ('3', 'p8', 'Security Chief', '125000');
+
+INSERT INTO positions ( PositionID, PersonID, PositionTitle, SalaryUSD )
+	VALUES ('4', 'p10', 'Network Architect', '115000');
+
+INSERT INTO positions ( PositionID, PersonID, PositionTitle, SalaryUSD )
+	VALUES ('5', 'p12', 'Network Technician', '95000');
+
+INSERT INTO positions ( PositionID, PersonID, PositionTitle, SalaryUSD )
+	VALUES ('6', 'p15', 'Satellite Engineer', '80000');
+
+INSERT INTO positions ( PositionID, PersonID, PositionTitle, SalaryUSD )
+	VALUES ('7', 'p18', 'Radio Technician', '65000');
+
+INSERT INTO positions ( PositionID, PersonID, PositionTitle, SalaryUSD )
+	VALUES ('8', 'p19', 'Wire Technician', '50000');
+    
+-- JobCode Inserts --
+
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p1', '0627', 'Satellite Operator', 'Works on antennas');
+	
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p3', '0621', 'Radio Operator', 'Works on radios');
+
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p4', '0651', 'Network Engineer', 'Works on routers');
+	
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p6', '0611', 'Wire Technician', 'Works on cables');
+
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p7', '0627', 'Satellite Operator', 'Works on antennas');
+	
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p9', '0621', 'Radio Operator', 'Works on radios');
+
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p11', '0651', 'Network Engineer', 'Works on antennas');
+	
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p13', '0611', 'Wire Technician', 'Works on cables');
+
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p14', '0621', 'Radio Operator', 'Works on radios');
+	
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p16', '0621', 'Radio Operator', 'Works on radios');
+
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p17', '0651', 'Network Engineer', 'Works on routers');
+	
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p20', '0651', 'Network Engineer', 'Works on routers');
+
+INSERT INTO jobcode ( PersonID, MOS, JobTitle, JobDescription)
+	VALUES ('p21', '0651', 'Network Engineer', 'Works on routers');
+
+    
+-- Records Inserts --
+
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p1', 'p1', '235', '300', '300');
+	
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p3', 'p3', '285', '300', '300');
+
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p4', 'p4', '214', '256', '268');
+	
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p6', 'p6', '198', '243', '276');
+	
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p7', 'p7', '257', '276', '289');
+	
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p9', 'p9', '212', '234', '254');
+	
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p11', 'p11', '246', '289', '300');
+	
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p13', 'p13', '247', '300', '300');
+
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p14', 'p14', '187', '234', '256');
+	
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p16', 'p16', '210', '268', '283');
+	
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p17', 'p17', '215', '274', '292');
+	
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p20', 'p20', '196', '276', '254');
+	
+INSERT INTO records ( RecordID, PersonID, RangeScore, PFT, CFT )
+	VALUES ('p21', 'p21', '226', '294', '300');
+
+-- WeaponDetails Inserts --
+	
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100111', 'p1', 'M16A4', 'ACOG', '3 Point');
+	
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100200', 'p3', 'M16A4', 'Red Dot', '3 Point');
+
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100132', 'p4', 'M4', 'ACOG', '3 Point');
+	
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100234', 'p6', 'M16A4', 'Red Dot', '3 Point');
+
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100343', 'p7', 'M4', 'ACOG', '1 Point');
+	
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100457', 'p9', 'M9', 'Iron Sights', 'Holster');
+
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100567', 'p11', 'RPG', null, null);
+	
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100444', 'p13', 'M16A4', 'Red Dot', '3 Point');
+
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100673', 'p14', 'M4', 'ACOG', '1 Point');
+	
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100662', 'p16', 'M4', 'Red Dot', '1 Point');
+
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100772', 'p17', 'M16A4', 'ACOG', '3 Point');
+	
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100884', 'p20', 'M4', 'Red Dot', '1 Point');
+
+INSERT INTO weapondetails ( WeaponID, PersonID, WeaponType, WeaponScope, WeaponSling )
+	VALUES ('100992', 'p21', 'M16A4', 'ACOG', '3 Point');
+    
+
+-- CIFgear Inserts --
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c1', 'p1', '1001', '2001');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c2', 'p3', '1002', '2002');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c3', 'p4', '1003', '2003');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c4', 'p6', '1004', '2004');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c5', 'p7', '1005', '2005');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c6', 'p9', '1006', '2006');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c7', 'p11', '1007', '2007');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c8', 'p13', '1008', '2008');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c9', 'p14', '1009', '2009');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c10', 'p16', '1010', '2010');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c11', 'p17', '1011', '2011');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c12', 'p20', '1012', '2012');
+
+INSERT INTO cifgear ( EquipmentID, PersonID, GasMaskID, SapiID )
+	VALUES ('c13', 'p21', '1013', '2013');
+    
+
+-- CIFgearDetails Inserts --
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c1', 'Medium', 'Small', '9.5', 'Medium', 'Medium');
+	
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c2', 'Medium', 'Medium', '11', 'Medium', 'Large');
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c3', 'Small', 'Small', '8.5', 'Extra Large', 'Medium');
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c4', 'Small', 'Small', '12', 'Medium', 'Small');
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c5', 'Large', 'Medium', '12', 'Extra Large', 'Large');
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c6', 'Small', 'Small', '9', 'Small', 'Medium');
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c7', 'Large', 'Large', '13', 'Medium', 'Large');
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c8', 'Medium', 'Medium', '10', 'Large', 'Medium');
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c9', 'Large', 'Medium', '11.5', 'Medium', 'Large');
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c10', 'Medium', 'Medium', '10', 'Medium', 'Medium');
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c11', 'Medium', 'Small', '11', 'Medium', 'Medium');
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c12', 'Medium', 'Small', '10.5', 'Medium', 'Medium');
+
+INSERT INTO cifgeardetails ( EquipmentID, BlouseSize, TrouserSize, BootSize, KevlarSize,
+	FlakJacketSize )
+	VALUES ('c13', 'Small', 'Small', '8', 'Small', 'Medium');
+
+select *
+from people;
+
+select *
+from states;
+
+select *
+from marines;
+
+select * 
+from staff;
+
+select *
+from positions;
+
+select *
+from deploymentstatuscode;
+
+select *
+from jobcode;
+
+select *
+records;
+
+select *
+from weapondetails;
+
+select *
+from cifgear;
+
+select *
+from cifgeardetails;
+
+
+CREATE VIEW MarineInfo AS
+SELECT FirstName, LastName, Rank, MOS, WeaponID
+FROM people
+INNER JOIN marines
+ON people.PersonID = marines.PersonID
+INNER JOIN jobcode
+ON marines.PersonID = jobcode.PersonID
+INNER JOIN weapondetails
+ON marines.PersonID = weapondetails.PersonID
+Order By LastName;
+
+select *
+from MarineInfo;
+
+CREATE VIEW MarineCIF AS
+SELECT LastName, Rank, GasMaskID, SapiID, BlouseSize, TrouserSize, 
+BootSize, KevlarSize, FlakJacketSize
+FROM people
+INNER JOIN marines
+ON people.PersonID = marines.PersonID
+INNER JOIN cifgear
+ON marines.PersonID = cifgear.PersonID
+INNER JOIN cifgeardetails
+ON cifgear.EquipmentID = cifgeardetails.EquipmentID
+ORDER By LastName;
+
+select *
+from MarineCIF;
+
+
+SELECT TRUNC(
+	CAST(
+(SELECT COUNT (people.PersonID) AS under25
+FROM people
+RIGHT JOIN marines
+ON people.PersonID = marines.PersonID
+WHERE date_part('year',age(DOB)) < 25
+) as decimal (5,2)
+)
+/
+  (SELECT COUNT (PersonID) AS allmarines
+		FROM marines
+	)
+	*100
+	) as percentUnder25;
+
+
+SELECT FirstName, LastName, PositionTitle, StartDate, EndDate
+FROM people
+INNER JOIN staff
+ON people.PersonID = staff.PersonID
+INNER JOIN positions
+ON staff.PersonID = positions.PersonID
+WHERE EndDate is not null;
+
+
+CREATE OR REPLACE FUNCTION ValidWeapon()
+RETURNS TRIGGER AS $$
+BEGIN
+	IF new.WeaponID IS null then RAISE EXCEPTION 'WeaponID cannot be null';
+	END IF;
+	IF new.WeaponType IS null then RAISE EXCEPTION 'WeaponType cannot be null';
+	END IF;
+	RETURN NEW;
+END;
+
+$$ LANGUAGE plpgsql;
+
+
+CREATE trigger ValidWeapon
+before insert or update ON weapondetails
+for each row
+execute procedure ValidWeapon();
+
+CREATE ROLE ADMIN;
+GRANT ALL ON ALL TABLES IN SCHEMA PUBLIC TO ADMIN;
+
+CREATE ROLE COMPANYCOMMANDER;
+REVOKE ALL ON ALL TABLES IN SCHEMA PUBLIC FROM COMPANYCOMMANDER;
+GRANT SELECT ON ALL TABLES IN SCHEMA PUBLIC TO COMPANYCOMMANDER;
+GRANT INSERT ON People, Marines, Staff, Positions, Records TO COMPANYCOMMANDER;
+GRANT UPDATE ON People, Marines, Staff, Positions, Records TO COMPANYCOMMANDER;
+
+CREATE ROLE COMPANYCLERK;
+REVOKE ALL ON ALL TABLES IN SCHEMA PUBLIC FROM COMPANYCLERK;
+GRANT SELECT ON ALL TABLES IN SCHEMA PUBLIC TO COMPANYCLERK;
+GRANT INSERT ON People, Marines, Records TO COMPANYCLERK;
+GRANT UPDATE ON People, Marines, Records TO COMPANYCLERK;
+
+CREATE ROLE STAFFOFFICER;
+REVOKE ALL ON ALL TABLES IN SCHEMA PUBLIC FROM STAFFOFFICER;
+GRANT SELECT ON ALL TABLES IN SCHEMA PUBLIC TO STAFFOFFICER;
+GRANT INSERT ON People, Staff, Positions TO STAFFOFFICER;
+GRANT UPDATE ON People, Staff, Positions TO STAFFOFFICER;
+
+CREATE ROLE COMPANYARMORER;
+REVOKE ALL ON ALL TABLES IN SCHEMA PUBLIC FROM COMPANYARMORER;
+GRANT SELECT ON Marines, WeaponDetails TO COMPANYARMORER;
+GRANT INSERT ON WeaponDetails TO COMPANYARMORER;
+GRANT UPDATE ON WeaponDetails TO COMPANYARMORER;
+
+CREATE ROLE COMPANYSUPPLY;
+REVOKE ALL ON ALL TABLES IN SCHEMA PUBLIC FROM COMPANYSUPPLY;
+GRANT SELECT ON Marines, CIFgear, CIFgearDetails TO COMPANYSUPPLY;
+GRANT INSERT ON CIFgear, CIFgearDetails TO COMPANYSUPPLY;
+GRANT UPDATE ON CIFgear, CIFgearDetails TO COMPANYSUPPLY;
+
+
+
+
+
